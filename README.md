@@ -24,8 +24,10 @@ vagrant up
 ## Stopping the environment
 
 ```
-vagrant halt
+vagrant destroy
 ```
+
+(halt didn't work well)
 
 ## Notes
 
