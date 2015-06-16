@@ -1,0 +1,3 @@
+---
+# defaults file for roles/docker-registry
+private_docker_registry: "dk1:5000"

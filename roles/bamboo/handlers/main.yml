@@ -1,0 +1,13 @@
+---
+# handlers file for bamboo
+- name: Start haproxy
+  service: name=haproxy state=restarted enabled=yes
+
+- name: Stop haproxy
+  service: name=haproxy state=stopped enabled=no
+
+- name: Start bamboo
+  service: name=supervisord state=restarted enabled=yes
+
+- name: Stop bamboo
+  service: name=supervisord state=stopped enabled=no

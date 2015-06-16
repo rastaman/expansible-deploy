@@ -1,0 +1,6 @@
+---
+# handlers file for roles/docker
+
+- name: Start docker
+  service: name=docker state=started enabled=yes
+  sudo: yes

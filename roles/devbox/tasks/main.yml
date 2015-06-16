@@ -1,0 +1,14 @@
+---
+# tasks file for roles/devbox
+
+- name: install the developer box packages
+  yum: pkg=emacs-nox,htop,mlocate state=latest
+  sudo: yes
+  tags:
+    - devbox
+
+- name: update files database
+  shell: updatedb
+  sudo: yes
+  tags:
+    - devbox

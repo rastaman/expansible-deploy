@@ -1,0 +1,10 @@
+---
+# handlers file for roles/zookeeper
+
+- name: Restart zookeeper
+  shell: /etc/init.d/zookeeper-server restart
+  sudo: yes
+ 
+- name: Stop zookeeper
+  service: name=zookeeper-server state=stopped enabled=no
+  sudo: yes

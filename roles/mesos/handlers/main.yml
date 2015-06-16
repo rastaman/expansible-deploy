@@ -1,0 +1,25 @@
+---
+# handlers file for roles/mesos
+
+- name: Start mesos-master
+  service: name=mesos-master state=restarted enabled=yes
+  sudo: yes
+ 
+- name: Stop mesos-master
+  service: name=mesos-master state=stopped enabled=no
+  sudo: yes
+ 
+- name: Start mesos-slave
+  service: name=mesos-slave state=restarted enabled=yes
+  sudo: yes
+ 
+- name: Stop mesos-slave
+  service: name=mesos-slave state=stopped enabled=no
+  sudo: yes
+
+- name: Start marathon
+  service: name=marathon state=restarted enabled=yes
+  sudo: yes
+
+- name: Stop marathon
+  service: name=marathon state=stopped enabled=no

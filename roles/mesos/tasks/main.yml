@@ -1,0 +1,149 @@
+---
+# tasks file for roles/mesos
+
+# Common tasks for all Mesos nodes
+
+- name: install the mesosphere yum repo
+  yum: name=http://repos.mesosphere.io/el/7/noarch/RPMS/mesosphere-el-repo-7-1.noarch.rpm state=present
+  when: mesos_install_mode == "master" or mesos_install_mode == "slave"
+
+- name: install the mesos packages
+  yum: pkg=mesos state=latest
+  sudo: yes
+  when: mesos_install_mode == "master" or mesos_install_mode == "slave"
+
+- name: Set ZooKeeper URL # used for leader election amongst masters
+  copy:
+    content: "{{zookeeper_url}}"
+    dest: /etc/mesos/zk
+    mode: 0644
+  sudo: yes
+  when: mesos_install_mode == "master" or mesos_install_mode == "slave"
+
+# Tasks for Master nodes
+
+- name: install mesos
+  yum: name=mesos state=latest
+  when: mesos_install_mode == "master"
+
+- name: Set Mesos Master hostname
+  copy:
+    content: "{{mesos_local_address}}"
+    dest: /etc/mesos-master/hostname
+    mode: 0644
+  sudo: yes
+  when: mesos_install_mode == "master"
+
+- name: Set Mesos Master ip
+  copy:
+    content: "{{mesos_local_address}}"
+    dest: /etc/mesos-master/ip
+    mode: 0644
+  sudo: yes
+  when: mesos_install_mode == "master"
+
+- name: Set Mesos Master Cluster name
+  copy:
+    content: "{{mesos_cluster_name}}"
+    dest: /etc/mesos-master/cluster
+    mode: 0644
+  sudo: yes
+  when: mesos_install_mode == "master"
+
+- name: Set Mesos Master quorum count
+  copy:
+    content: "{{mesos_quorum_count}}"
+    dest: /etc/mesos-master/quorum
+    mode: 0644
+  sudo: yes
+  when: mesos_install_mode == "master"
+
+# Marathon
+
+- name: install marathon
+  yum: name=marathon state=latest
+  when: mesos_install_mode == "master"
+
+- name: Create marathon conf directory
+  file: path=/etc/marathon/conf state=directory
+  sudo: yes
+  when: mesos_install_mode == "master"
+
+- name: Copy subscriber file
+  template: src=./event_subscriber.j2 dest=/etc/marathon/conf/event_subscriber
+  sudo: yes
+  when: mesos_install_mode == "master"
+
+- name: Copy enpoints file
+  template: src=./http_endpoints.j2 dest=/etc/marathon/conf/http_endpoints
+  sudo: yes
+  when: mesos_install_mode == "master"
+
+- name: Copy task launch timeout configuration
+  shell: echo '360000' | sudo tee /etc/marathon/conf/task_launch_timeout
+  sudo: yes
+  when: mesos_install_mode == "master"
+
+# Tasks for Slave nodes
+- name: install the mesos packages
+  yum: pkg=mesos state=latest
+  sudo: yes
+  when: mesos_install_mode == "slave"
+
+- name: configure containerizers
+  shell: echo 'docker,mesos' | sudo tee /etc/mesos-slave/containerizers
+  sudo: yes
+  when: mesos_install_mode == "slave"
+
+- name: configure executors registration timeout
+  shell: echo '5mins' | sudo tee /etc/mesos-slave/executor_registration_timeout
+  sudo: yes
+  when: mesos_install_mode == "slave"
+
+- name: Set Mesos Slave hostname
+  copy:
+    content: "{{mesos_local_address}}"
+    dest: /etc/mesos-slave/hostname
+    mode: 0644
+  sudo: yes
+  when: mesos_install_mode == "slave"
+
+- name: Set Mesos Slave ip
+  copy:
+    content: "{{mesos_local_address}}"
+    dest: /etc/mesos-slave/ip
+    mode: 0644
+  sudo: yes
+  when: mesos_install_mode == "slave"
+
+#- name: Set Mesos Slave isolation
+#  copy:
+#    content: "cgroups/cpu,cgroups/mem"
+#    dest: /etc/mesos-slave/isolation
+#    mode: 0644
+#  sudo: yes
+#  notify:
+#    - Start mesos-slave
+#  when: mesos_install_mode == "slave"
+
+# Tasks for Master, Slave, and ZooKeeper nodes
+
+# Tasks for ZooKeeper nodes only
+
+# Start Services
+
+- name: Start Mesos Master Services
+  shell: echo 'Start mesos-master'
+  sudo: yes
+  notify:
+    - Start mesos-master
+    - Start marathon
+  when: mesos_install_mode == "master"
+  
+- name: Start Mesos Slave Services
+  shell: echo 'Start mesos-slave'
+  sudo: yes
+  notify:
+    - Start mesos-slave
+  when: mesos_install_mode == "slave"
+

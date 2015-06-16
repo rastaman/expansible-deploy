@@ -1,0 +1,25 @@
+---
+# tasks file for roles/docker
+- name: install the docker packages
+  yum: pkg=device-mapper,device-mapper-event-libs,docker state=latest
+  sudo: yes
+
+- name: copy configuration
+  template: src=./docker.j2 dest=/etc/sysconfig/docker
+  sudo: yes
+
+#- name: create host metadata repository folder
+#  sudo: yes
+#  file: path=/opt/docker/data state=directory
+#
+#- name: create host data repository folder
+#  sudo: yes
+#  file: path=/opt/docker/metadata state=directory
+
+- name: copy configuration for storage
+  copy: src=./docker-storage dest=/etc/sysconfig/docker-storage
+  sudo: yes
+
+- name: start docker
+  service: name=docker state=restarted enabled=yes
+  sudo: yes

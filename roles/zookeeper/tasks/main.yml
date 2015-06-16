@@ -1,0 +1,31 @@
+---
+# tasks file for roles/zookeeper
+
+
+# Tasks for ZooKeeper nodes only
+
+- name: install zookeeper repo
+  yum: name=http://archive.cloudera.com/cdh4/one-click-install/redhat/6/x86_64/cloudera-cdh-4-0.x86_64.rpm state=present
+  sudo: yes
+
+- name: install jdk
+  yum: name=java-1.7.0-openjdk-headless.x86_64 state=present
+  sudo: yes
+
+- name: install zookeeper
+  yum: pkg=zookeeper,zookeeper-server state=latest
+  sudo: yes
+
+- name: Create zookeeper config file
+  template: src=zoo.cfg.j2 dest=/etc/zookeeper/conf/zoo.cfg
+  sudo: yes
+
+- name: configure zookeeper ID
+  shell: sudo -u zookeeper zookeeper-server-initialize --force --myid= "{{ zoo_id }}" 
+  sudo: yes
+
+- name: Create zookeeper myid file
+  template: src=zoo_id.j2 dest=/var/lib/zookeeper/myid
+  sudo: yes
+  notify:
+    - Restart zookeeper

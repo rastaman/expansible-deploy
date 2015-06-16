@@ -1,0 +1,9 @@
+---
+# defaults file for role/base
+hostsfile: |
+  {% for server in groups.all_servers %}
+  {{hostvars[server]['ansible_ssh_host']}} {{ server }}
+  {% endfor %}
+
+rpm_base: "http://ftp.free.fr/mirrors/ftp.centos.org"
+rpm_proxy_host: "http://dk1:3128"

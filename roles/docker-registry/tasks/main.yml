@@ -1,0 +1,23 @@
+---
+# tasks file for roles/docker-registry
+- name: install python setuptools
+  sudo: yes
+  yum: pkg=python-setuptools,python-pip state=latest
+
+- name: install docker-py
+  sudo: yes
+  pip: name=docker-py version=1.1.0
+
+- name: images-container
+  docker:
+    name: private_registry
+    image: registry:2.0
+    state: started
+    expose:
+    - 5000
+    ports:
+     - 5000:5000
+    env:
+        REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY = /opt/docker-registry
+    volumes:
+        /opt/docker-registry:/opt/docker-registry:rw

@@ -1,0 +1,47 @@
+---
+# tasks file for bamboo
+
+- name: install haproxy
+  yum: pkg=haproxy state=latest
+  when: bamboo_install_mode == "haproxy"
+
+- name: start haproxy
+  service: name=haproxy state=restarted enabled=yes
+  when: bamboo_install_mode == "haproxy"
+
+- name: prepare bamboo install folder
+  file: path=/opt state=directory
+  sudo: yes
+  when: bamboo_install_mode == "haproxy"
+
+- name: unpack bamboo
+  unarchive: copy=yes dest=/opt src=./bamboo-0.2.12-bin.tar.gz group=root owner=root
+  when: bamboo_install_mode == "haproxy"
+
+- name: copy bamboo configuration
+  template: src=./production.example.j2 dest=/opt/bamboo/config/production.json group=root owner=root
+
+- name: copy haproxy configuration template
+  copy: src=./haproxy_template.cfg dest=/opt/bamboo/config/haproxy_template.cfg group=root owner=root
+
+# Supervisord
+
+- name: install supervisor
+  yum: name=supervisor.noarch state=present
+  when: bamboo_install_mode == "haproxy"
+
+- name: create config dir for supervisor
+  file: path=/etc/supervisord state=directory group=root owner=root
+  when: bamboo_install_mode == "haproxy"
+
+- name: setup base configuration for supervisord
+  copy: src=./bamboo.ini dest=/etc/supervisord.d/bamboo.ini group=root owner=root
+  when: bamboo_install_mode == "haproxy"
+
+- name: install supervisord as a systemd service
+  copy: src=./supervisord.service dest=/usr/lib/systemd/system/supervisord.service group=root owner=root
+  when: bamboo_install_mode == "haproxy"
+
+- name: start supervisord
+  service: name=supervisord state=restarted enabled=yes
+  when: bamboo_install_mode == "haproxy"

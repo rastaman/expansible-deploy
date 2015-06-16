@@ -1,0 +1,17 @@
+---
+# tasks file for role/squid
+
+- name: install squid
+  yum: name=squid state=present
+
+- name: give ownership of cache folder to squid
+  file: path=/var/spool/squid group=squid owner=squid
+  sudo: yes
+
+- name: setup base configuration for squid
+  copy: src=./squid.conf dest=/etc/squid/squid.conf group=root owner=root
+  sudo: yes
+
+- name: start squid
+  service: name=squid state=started enabled=yes
+  sudo: yes

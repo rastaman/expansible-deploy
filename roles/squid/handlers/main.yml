@@ -1,0 +1,9 @@
+---
+# handlers file for role/squid
+- name: Start squid
+  service: name=squid state=start enabled=yes
+  sudo: yes
+
+- name: Stop squid
+  service: name=squid state=stopped enabled=no
+  sudo: yes
