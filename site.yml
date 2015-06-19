@@ -1,0 +1,80 @@
+---
+# This playbook deploys a Mesos cluster with Marathon and Qubits's Bamboo.
+# RUN: ansible-playbook --ask-sudo-pass -i hosts site.yml
+
+- name: install-base
+  hosts: bootstrap
+  remote_user: vagrant
+  sudo: True
+
+  roles:
+    - { role: base, install_mode: "default" }
+    - { role: squid }
+    - { role: base, install_mode: "setup_yum" }
+
+- name: deploy-nodes
+  hosts: nodes
+  remote_user: vagrant
+  sudo: True
+
+  roles:
+    - { role: base, install_mode: "default" }
+    - { role: base, install_mode: "setup_yum" }
+
+- name: deploy-zookeeper
+  hosts: zookeeper
+  remote_user: vagrant
+  sudo: True
+
+  roles:
+    - { role: zookeeper, tags: ["zookeeper"] }
+
+- name: deploy-docker
+  hosts: docker
+  remote_user: vagrant
+  sudo: True
+
+  roles:
+    - { role: docker, tags: ["docker"] }
+
+#- name: deploy-docker-registry
+#  hosts: docker-registry
+#  remote_user: vagrant
+#  sudo: True
+#
+#  roles:
+#    - { role: docker-registry, tags: ["docker"] }
+
+- name: deploy and configure the mesos masters
+  hosts: mesos_masters
+  remote_user: vagrant
+  sudo: True
+
+  roles:
+    - { role: mesos, mesos_install_mode: "master", tags: ["mesos-master"] }
+
+- name: deploy and configure the mesos slaves
+  hosts: mesos_slaves
+  remote_user: vagrant
+  sudo: True
+
+  roles:
+    - { role: mesos, mesos_install_mode: "slave", tags: ["mesos-slave"] }
+
+- name: deploy and configure the haproxy
+  hosts: haproxy
+  remote_user: vagrant
+  sudo: True
+
+  roles:
+    - { role: base, install_mode: "default" }
+    - { role: base, install_mode: "setup_yum" }
+    - { role: bamboo, bamboo_install_mode: "haproxy", tags: ["haproxy"] }
+
+- name: install developer box
+  hosts: all
+  remote_user: vagrant
+  sudo: True
+
+  roles:
+    - { role: devbox }
