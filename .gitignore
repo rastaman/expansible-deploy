@@ -1,7 +1,5 @@
 .project
 .vagrant/
 docker.vdi
-hosts
 keys/**
-site.yml
 yum.conf
