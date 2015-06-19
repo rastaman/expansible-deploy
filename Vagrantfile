@@ -9,8 +9,6 @@
 
 $bootstrap_script = <<SCRIPT
 sudo cat /vagrant/keys/id_rsa.pub >> /home/vagrant/.ssh/authorized_keys
-sudo cp /vagrant/yum.conf /etc/yum.conf
-sudo yum install -y gcc kernel-devel-3.10.0-229.4.2.el7.x86_64
 SCRIPT
 
 Vagrant.configure("2") do |config|
@@ -31,7 +29,7 @@ Vagrant.configure("2") do |config|
       vb.name = "dk1-vm"
       vb.customize ["modifyvm", :id, "--memory", 1024]
       vb.customize ["modifyvm", :id, "--cpus", 1]
-      vb.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', 'docker.vdi']
+      #vb.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', 'docker.vdi']
     end
     dk1.vm.synced_folder "~/.squid/dk1", "/var/spool/squid", 
       owner: "root",

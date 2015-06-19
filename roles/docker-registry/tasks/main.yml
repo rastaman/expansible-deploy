@@ -17,7 +17,7 @@
     - 5000
     ports:
      - 5000:5000
-    env:
-        REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY = /opt/docker-registry
-    volumes:
-        /opt/docker-registry:/opt/docker-registry:rw
+#    env:
+#        REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY = /opt/docker-registry
+#    volumes:
+#        /opt/docker-registry:/opt/docker-registry:rw

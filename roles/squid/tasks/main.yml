@@ -1,8 +1,12 @@
 ---
 # tasks file for role/squid
 
+#- name: install squid
+#  yum: name=squid state=present
+
+# For vagrant box:
 - name: install squid
-  yum: name=squid state=present
+  yum: name=/vagrant/files/squid-3.3.8-12.el7_0.x86_64.rpm state=present
 
 - name: give ownership of cache folder to squid
   file: path=/var/spool/squid group=squid owner=squid
