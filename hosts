@@ -1,0 +1,50 @@
+node1 ansible_ssh_host=192.168.51.2 ansible_ssh_user=vagrant
+node2 ansible_ssh_host=192.168.51.3 ansible_ssh_user=vagrant
+node3 ansible_ssh_host=192.168.51.4 ansible_ssh_user=vagrant
+ha1 ansible_ssh_host=192.168.51.5 ansible_ssh_user=vagrant
+dk1 ansible_ssh_host=192.168.51.6 ansible_ssh_user=vagrant
+
+[nodes]
+node1
+node2
+node3
+
+[mesos_masters]
+node1 zoo_id=1
+node2 zoo_id=2
+node3 zoo_id=3
+
+[mesos_slaves]
+node1
+node2
+node3
+
+[haproxy]
+ha1
+
+[bootstrap]
+dk1
+
+[all_servers]
+node1
+node2
+node3
+ha1
+dk1
+
+[testnode]
+node1
+
+[zookeeper]
+node1
+node2
+node3
+
+[docker]
+dk1
+node1
+node2
+node3
+
+[docker-registry]
+dk1
