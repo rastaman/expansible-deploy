@@ -17,7 +17,18 @@
   yum: name=http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm state=present
   when: install_mode == "setup_yum"
 
+- name: Install gcc
+  yum: name=gcc state=latest
+  when: install_mode == "setup_yum"
+
+- name: Install kernel libs
+  yum: name=kernel-devel state=latest
+  when: install_mode == "setup_yum"
+
+- name: Install bzip2 libs
+  yum: name=bzip2 state=latest
+  when: install_mode == "setup_yum"
+
 - name: Update yum
   yum: name='*' state=latest
   when: install_mode == "setup_yum"
-
