@@ -19,6 +19,11 @@ node1
 node2
 node3
 
+[ceph]
+node1
+node2
+node3
+
 [haproxy]
 ha1
 
