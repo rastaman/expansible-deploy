@@ -36,10 +36,10 @@ Vagrant.configure("2") do |config|
       group: "root",
       type: "virtualbox",
       :mount_options => ["dmode=777","fmode=666"]
-    dk1.vm.provision "ansible" do |a|
-      a.playbook = "site.yml"
-      a.inventory_path = "hosts"
-    end
+    #dk1.vm.provision "ansible" do |a|
+    #  a.playbook = "site.yml"
+    #  a.inventory_path = "hosts"
+    #end
   end
 
   # Mesos Box 1
@@ -51,10 +51,10 @@ Vagrant.configure("2") do |config|
       s.inline = $bootstrap_script
       s.privileged = false
     end
-    node1.vm.provision "ansible" do |a|
-      a.playbook = "site.yml"
-      a.inventory_path  = "hosts"
-    end
+    #node1.vm.provision "ansible" do |a|
+    #  a.playbook = "site.yml"
+    #  a.inventory_path  = "hosts"
+    #end
     node1.vm.provider "virtualbox" do |vb|
       vb.name = "node1-vm"
       vb.customize ["modifyvm", :id, "--memory", 2048]
@@ -71,10 +71,10 @@ Vagrant.configure("2") do |config|
       s.inline = $bootstrap_script
       s.privileged = false
     end
-    node2.vm.provision "ansible" do |a|
-      a.playbook = "site.yml"
-      a.inventory_path = "hosts"
-    end
+    #node2.vm.provision "ansible" do |a|
+    #  a.playbook = "site.yml"
+    #  a.inventory_path = "hosts"
+    #end
     node2.vm.provider "virtualbox" do |vb|
       vb.name = "node2-vm"
       vb.customize ["modifyvm", :id, "--memory", 2048]
@@ -91,10 +91,10 @@ Vagrant.configure("2") do |config|
       s.inline = $bootstrap_script
       s.privileged = false
     end
-    node3.vm.provision "ansible" do |a|
-      a.playbook = "site.yml"
-      a.inventory_path = "hosts"
-    end
+    #node3.vm.provision "ansible" do |a|
+    #  a.playbook = "site.yml"
+    #  a.inventory_path = "hosts"
+    #end
     node3.vm.provider "virtualbox" do |vb|
       vb.name = "node3-vm"
       vb.customize ["modifyvm", :id, "--memory", 2048]
@@ -111,10 +111,10 @@ Vagrant.configure("2") do |config|
       s.inline = $bootstrap_script
       s.privileged = false
     end
-    ha1.vm.provision "ansible" do |a|
-      a.playbook = "site.yml"
-      a.inventory_path = "hosts"
-    end
+    #ha1.vm.provision "ansible" do |a|
+    #  a.playbook = "site.yml"
+    #  a.inventory_path = "hosts"
+    #end
     ha1.vm.provider "virtualbox" do |vb|
       vb.name = "ha1-vm"
       vb.customize ["modifyvm", :id, "--memory", 2048]
