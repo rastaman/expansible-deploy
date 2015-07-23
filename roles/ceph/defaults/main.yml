@@ -1,0 +1,6 @@
+---
+# defaults file for roles/ceph
+ceph_release: hammer
+ceph_distro: el7
+ceph_user: ceph
+ceph_password: mdp4ceph
