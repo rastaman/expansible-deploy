@@ -8,9 +8,9 @@
   sudo: True
 
   roles:
-    - { role: base, install_mode: "default" }
-    - { role: squid }
-    - { role: base, install_mode: "setup_yum" }
+    - { role: base, install_mode: "default", tags: ["bootstrap"] }
+    - { role: squid, tags: ["bootstrap"] }
+    - { role: base, install_mode: "setup_yum", tags: ["bootstrap"] }
 
 - name: deploy-nodes
   hosts: nodes
@@ -35,15 +35,15 @@
   sudo: True
 
   roles:
-    - { role: docker, tags: ["docker"] }
+    - { role: docker, tags: ["docker","bootstrap"] }
 
-#- name: deploy-docker-registry
-#  hosts: docker-registry
-#  remote_user: vagrant
-#  sudo: True
-#
-#  roles:
-#    - { role: docker-registry, tags: ["docker"] }
+- name: deploy-docker-registry
+  hosts: docker-registry
+  remote_user: vagrant
+  sudo: True
+
+  roles:
+    - { role: docker-registry, tags: ["docker","bootstrap"] }
 
 - name: deploy and configure the mesos masters
   hosts: mesos_masters
@@ -77,4 +77,4 @@
   sudo: True
 
   roles:
-    - { role: devbox }
+    - { role: devbox, tags: ["bootstrap"] }
