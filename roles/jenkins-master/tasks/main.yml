@@ -1,0 +1,19 @@
+---
+# tasks file for roles/jenkins-master
+# Check that a page returns a status 200 and fail if the word AWESOME is not in the page contents.
+- name: deploy jenkins master on marathon
+  uri:
+    url: http://your.jira.example.com/rest/api/2/issue/
+    method: PUT
+    return_content: yes
+#    user: your_username
+#    password: your_pass
+#    force_basic_auth: yes
+    body: "{{ lookup('file','jenkins-master.json') }}"
+    status_code: 201
+    body_format: json
+  register: webpage
+
+- name: Fail if marathon response is not expected
+  action: fail
+  when: "'success' not in webpage.content"

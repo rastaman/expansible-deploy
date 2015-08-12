@@ -1,0 +1,39 @@
+---
+# tasks file for roles/ceph
+- name: Install Ceph repository
+  sudo: yes
+  copy: src=./ceph.repo dest=/etc/yum.repos.d/ceph.repo
+  
+- name: Update packages list
+  sudo: yes
+  yum: name='*' state=latest
+
+- name: Install Ceph package
+  sudo: yes
+  yum: name=ceph-deploy state=latest
+  with_items:
+    - yum-plugin-priorities
+    - ntp
+    - ntpdate
+    - ntp-doc
+    - ceph-deploy
+
+- name: Create Ceph user
+  user: name={{ ceph_user }} password={{ ceph_password }} groups="sudo,{{ ceph_user }}"
+  sudo: yes
+
+#The default configuration on some distributions (e.g., CentOS) has the networking interface(s) off by default. 
+#Ensure that, during boot up, your network interface(s) turn(s) on so that your Ceph daemons can communicate over the network. 
+#For example, on Red Hat and CentOS, navigate to /etc/sysconfig/network-scripts and ensure that the ifcfg-{iface} file has ONBOOT set to yes.
+
+- name: Edit networkscripts to start iface on boot
+  lineinfile: dest=/etc/fstab line="{{ swapfile_location }}   none    swap    sw    0   0" state=present
+  
+#sudo firewall-cmd --zone=public --add-port=6789/tcp --permanent
+- name: Set firewalld
+  sudo: yes
+  shell: firewall-cmd --permanent --add-port=6789/tcp --zone=public
+
+- name: Restart firewalld
+  sudo: yes
+  service: name=firewalld state=restarted
