@@ -3,10 +3,9 @@
 # RUN: ansible-playbook -i hosts ceph.yml
 
 - name: install ceph (preflight check)
-  hosts: ceph
+  hosts: ceph_base
   remote_user: vagrant
   sudo: true
-
   roles:
     - { role: ceph-preflight, tags: ["ceph"] }
 
@@ -14,6 +13,10 @@
   hosts: ceph_admin
   remote_user: vagrant
   sudo: false
-
   roles:
     - { role: ceph-admin, tags: ["ceph-admin"] }
+
+- name: copy public key to nodes
+  hosts: ceph_node
+  roles:
+    - { role: ceph-node }

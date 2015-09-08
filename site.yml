@@ -80,7 +80,7 @@
     - { role: devbox, tags: ["bootstrap"] }
 
 - name: install ceph (preflight check)
-  hosts: ceph
+  hosts: ceph_base
   remote_user: vagrant
   sudo: true
 

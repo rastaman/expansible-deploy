@@ -19,11 +19,16 @@ node1
 node2
 node3
 
-[ceph]
+[ceph_base]
 node1
 node2
 node3
 dk1
+
+[ceph_node]
+node1
+node2
+node3
 
 [ceph_admin]
 dk1
