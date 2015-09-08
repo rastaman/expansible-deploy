@@ -1,13 +1,13 @@
 {
   "Marathon": {
-    "Endpoint": "http://localhost:8080"
+    "Endpoint": "{{marathon_url}}"
   },
 
   "Bamboo": {
-    "Endpoint": "http://10.0.2.2:8000",
+    "Endpoint": "http://{{ inventory_hostname }}:{{ bamboo_port }}",
     "Zookeeper": {
-      "Host": "localhost",
-      "Path": "/foo",
+      "Host": "{{ zookeeper_hosts }}",
+      "Path": "/marathon-haproxy/state",
       "ReportingDelay": 5
     }
   },
