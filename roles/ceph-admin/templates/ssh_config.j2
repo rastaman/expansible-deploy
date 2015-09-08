@@ -1,0 +1,7 @@
+{% for host in groups['ceph'] %}
+{% if ansible_hostname != host %}
+Host {{ host }}
+   Hostname {{ host }}
+   User {{ceph_user}}
+{% endif %}
+{% endfor %}

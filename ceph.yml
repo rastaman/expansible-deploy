@@ -1,0 +1,19 @@
+---
+# This playbook deploys a Ceph cluster.
+# RUN: ansible-playbook -i hosts ceph.yml
+
+- name: install ceph (preflight check)
+  hosts: ceph
+  remote_user: vagrant
+  sudo: true
+
+  roles:
+    - { role: ceph-preflight, tags: ["ceph"] }
+
+- name: setup ceph admin
+  hosts: ceph_admin
+  remote_user: vagrant
+  sudo: false
+
+  roles:
+    - { role: ceph-admin, tags: ["ceph-admin"] }
