@@ -6,7 +6,7 @@
   user: name={{ceph_user}} generate_ssh_key=yes ssh_key_bits=2048 ssh_key_file=.ssh/id_rsa
 
 - name: Get back the key (private and public) to host
-  fetch: src=/home/{{ceph_user}}/.ssh/{{ item }} dest=keys/ceph-{{ ansible_hostname }}-{{ item }} flat=yes
+  fetch: src=/home/{{ceph_user}}/.ssh/{{ item }} dest=keys/{{ceph_user}}-{{ ansible_hostname }}-{{ item }} flat=yes
   sudo: True
   with_items:
     - id_rsa
@@ -14,6 +14,9 @@
 
 - name: Setup ssh configuration of the admin node to access ceph nodes
   template: src=./ssh_config.j2 dest=/home/{{ceph_user}}/.ssh/config
-  
-- name: Give good permissions to the ssh config
-  file: name=/home/{{ceph_user}}/.ssh/config mode=0440 state=present
+  remote_user: "{{ceph_user}}"
+  sudo: True
+
+- name: Give the right permissions to the ssh config
+  file: name=/home/{{ceph_user}}/.ssh/config mode=0440 state=file
+  sudo: True
