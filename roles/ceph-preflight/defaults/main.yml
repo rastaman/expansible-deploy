@@ -4,3 +4,4 @@ ceph_release: hammer
 ceph_distro: el7
 ceph_user: ceph
 ceph_password: mdp4ceph
+ceph_iface: enp0s8

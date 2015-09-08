@@ -24,11 +24,18 @@ zookeeper_hosts: "{% for server in groups.mesos_masters %}{{ server }}:{{ zookee
 marathon_port: "8080"
 marathon_url: "{% for server in groups.mesos_masters %}http://{{ server }}:{{ marathon_port }}{% if not loop.last %},{% else %}{% endif %}{% endfor %}"
 
-bamboo_port: "8000"
-
 # RPM
 rpm_base: "http://ftp.free.fr/mirrors/ftp.centos.org"
 rpm_proxy_host: "http://dk1:3128"
 
 # Docker
 private_docker_registry: "dk1:5000"
+
+# Ceph
+ceph_release: hammer
+ceph_distro: el7
+ceph_user: ceph
+ceph_password: mdp4ceph
+ceph_iface: enp0s8
+ceph_admin_node: dk1
+
