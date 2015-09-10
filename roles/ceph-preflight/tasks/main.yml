@@ -2,13 +2,13 @@
 # tasks file for roles/ceph
 - name: Install Ceph repository
   sudo: yes
-  copy: src=./ceph.repo dest=/etc/yum.repos.d/ceph.repo
+  template: src=./ceph.repo.j2 dest=/etc/yum.repos.d/ceph.repo
 
 - name: Update packages list
   sudo: yes
   yum: name='*' state=latest
 
-- name: Install Ceph package
+- name: Install Ceph prerequisites packages
   sudo: yes
   yum: name={{ item }} state=latest
   with_items:

@@ -42,7 +42,25 @@
     - node3
     - dk1
 
-- name: Purge nodes to test that the connectivity is ok
+- name: Uninstall nodes so the installation is repeatable
+  shell: ceph-deploy uninstall {{ceph_nodes}}
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "create_cluster"
+
+- name: Remove other support packages not cleaned by the previous step
+  shell: ssh -o StrictHostKeyChecking=no {{ceph_user}}@{{item}} "sudo yum remove -y python-rados python-cephfs librados2 librbd1 python-rbd libcephfs1" >>ceph_install.log
+  sudo: True
+  sudo_user: "{{ceph_user}}"
+  when: ceph_install_mode == "create_cluster"
+  with_items:
+    - node1
+    - node2
+    - node3
+    - dk1
+
+- name: Purge data of nodes
   shell: ceph-deploy purgedata {{ceph_nodes}}
   remote_user: "{{ceph_user}}"
   sudo_user: "{{ceph_user}}"
@@ -90,3 +108,4 @@
   sudo_user: "{{ceph_user}}"
   sudo: True
   when: ceph_install_mode == "create_cluster"
+

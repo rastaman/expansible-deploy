@@ -13,3 +13,4 @@
 - name: Add public key to ceph nodes and users
   authorized_key: user={{ ceph_user }} key="{{ lookup('file', 'keys/'+ ceph_user + '-' + ceph_admin_node + '-id_rsa.pub') }}"
   sudo: True
+

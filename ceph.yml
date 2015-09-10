@@ -2,6 +2,12 @@
 # This playbook deploys a Ceph cluster.
 # RUN: ansible-playbook -i hosts ceph.yml
 
+- name: open up ports
+  hosts: nodes
+  sudo: true
+  roles:
+    - { role: firewalld, tags: ["misc"] }
+
 - name: install ceph (preflight check)
   hosts: ceph_base
   remote_user: vagrant
@@ -16,8 +22,8 @@
   roles:
     - { role: ceph-admin, ceph_install_mode: "base_setup", tags: ["ceph-admin"] }
 
-- name: copy public key to nodes
-  hosts: ceph_node
+- name: copy public key to nodes and add ceph to sudoers
+  hosts: ceph_base
   roles:
     - { role: ceph-node }
 
