@@ -27,3 +27,10 @@
   sudo: true
   roles:
     - { role: ceph-admin, ceph_install_mode: "create_cluster", tags: ["ceph-create-cluster"] }
+
+- name: init cluster
+  hosts: ceph_admin
+  remote_user: ceph
+  sudo: true
+  roles:
+    - { role: ceph-admin, ceph_install_mode: "init_cluster", tags: ["ceph-init-cluster"] }

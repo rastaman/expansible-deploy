@@ -96,7 +96,7 @@
   when: ceph_install_mode == "create_cluster"
 
 - name: Configure network
-  ini_file: dest=/home/{{ceph_user}}/{{ceph_cluster}}/ceph.conf section=global option="public network" value={{ceph_public_ip}} mode=0600 backup=yes
+  ini_file: dest=/home/{{ceph_user}}/{{ceph_cluster}}/ceph.conf section=global option="public network" value={{ceph_public_ip}}/{{ceph_netmask}} mode=0600 backup=yes
   remote_user: "{{ceph_user}}"
   sudo_user: "{{ceph_user}}"
   sudo: True
@@ -109,3 +109,55 @@
   sudo: True
   when: ceph_install_mode == "create_cluster"
 
+- name: Init OSD deamon
+  shell: ceph-deploy mon create-initial chdir=/home/{{ceph_user}}/{{ceph_cluster}}
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "init_cluster"
+
+- name: Set config and keys paths
+  set_fact:
+    ceph_config_keys:
+      - /home/{{ceph_user}}/{{ceph_cluster}}/ceph.bootstrap-mds.keyring
+      - /home/{{ceph_user}}/{{ceph_cluster}}/ceph.bootstrap-osd.keyring
+      - /home/{{ceph_user}}/{{ceph_cluster}}/ceph.bootstrap-rgw.keyring
+      - /home/{{ceph_user}}/{{ceph_cluster}}/ceph.client.admin.keyring
+      - /home/{{ceph_user}}/{{ceph_cluster}}/ceph.conf
+      - /home/{{ceph_user}}/{{ceph_cluster}}/ceph.log
+      - /home/{{ceph_user}}/{{ceph_cluster}}/ceph.mon.keyring
+  when: ceph_install_mode == "init_cluster"
+
+#- name: Move one file to test
+#  stat: path=/home/{{ceph_user}}/{{ceph_cluster}}/ceph.mon.keyring
+#  register: keyring_stat
+#  remote_user: "{{ceph_user}}"
+#  sudo_user: "{{ceph_user}}"
+#  sudo: True
+#  when: ceph_install_mode == "init_cluster"
+
+#- name: Move testfile to a backup
+#  command: mv /home/{{ceph_user}}/{{ceph_cluster}}/ceph.mon.keyring /home/{{ceph_user}}/{{ceph_cluster}}/ceph.mon.keyring.bak
+#  when: keyring_stat.stat.exists
+#  remote_user: "{{ceph_user}}"
+#  sudo_user: "{{ceph_user}}"
+#  sudo: True
+
+- name: Stat for Ceph config and keys
+  stat: >
+    path={{ item }}
+  with_items: ceph_config_keys
+  ignore_errors: true
+  register: statconfig
+  when: ceph_install_mode == "init_cluster"
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+
+- name: Check that every file exist
+  fail: msg="{{item.item}} didn't exist!"
+  when: item.stat.exists == False and ceph_install_mode == "init_cluster"
+  with_items: statconfig.results
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True

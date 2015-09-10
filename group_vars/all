@@ -39,5 +39,6 @@ ceph_password: mdp4ceph
 ceph_iface: enp0s8
 ceph_admin_node: dk1
 ceph_public_ip: 192.168.51.6
+ceph_netmask: 24
 ceph_cluster: expansible-cluster
 ceph_nodes: "{% for server in groups.ceph_node %}{{ server }}{% if not loop.last %} {% else %}{% endif %}{% endfor %}"
