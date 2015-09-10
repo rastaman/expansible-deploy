@@ -86,3 +86,21 @@
 
   roles:
     - { role: ceph-preflight, tags: ["ceph"] }
+
+- name: open ports for mesos cluster
+  hosts: nodes
+  sudo: true
+  roles:
+    - { role: firewalld, install_mode: "mesos", tags: ["misc"] }
+
+- name: open ports for haproxy/bamboo
+  hosts: haproxy
+  sudo: true
+  roles:
+    - { role: firewalld, install_mode: "haproxy", tags: ["misc"] }
+
+- name: open ports for ceph cluster
+  hosts: ceph_base
+  sudo: true
+  roles:
+    - { role: firewalld, install_mode: "ceph", tags: ["misc"] }

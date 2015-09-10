@@ -1,20 +1,50 @@
 ---
 # Open ports for the cluster. Should be put inside each role
+
+- name: Be sure firewalld is started
+  sudo: yes
+  service: name=firewalld state=started enabled=yes
+
+# Rules for Mesos master/slave
 - name: Open zookeeper client
   firewalld: port=2181/tcp permanent=true state=enabled
+  when: install_mode == 'mesos'
 
 - name: Open zookeeper server
   firewalld: port=2888/tcp permanent=true state=enabled
+  when: install_mode == 'mesos'
 
 - name: Open marathon
   firewalld: port=8080/tcp permanent=true state=enabled
+  when: install_mode == 'mesos'
 
 - name: Open mesos
   firewalld: port=5050/tcp permanent=true state=enabled
+  when: install_mode == 'mesos'
 
 - name: Open mesos slave
   firewalld: port=5051/tcp permanent=true state=enabled
+  when: install_mode == 'mesos'
 
+# Rules for the proxy
+- name: Open haproxy
+  firewalld: port=80/tcp permanent=true state=enabled
+  when: install_mode == 'haproxy'
+
+- name: Open bamboo
+  firewalld: port=8000/tcp permanent=true state=enabled
+  when: install_mode == 'haproxy'
+
+# Rules for ceph
+- name: Open Ceph Monitor nodes
+  firewalld: port=6789/tcp permanent=true state=enabled
+  when: install_mode == 'ceph'
+
+- name: Open Ceph Monitor nodes
+  firewalld: port=6800-7300/tcp permanent=true state=enabled
+  when: install_mode == 'ceph'
+
+# General rules
 - name: Open ntp
   firewalld: port=123/tcp permanent=true state=enabled
 

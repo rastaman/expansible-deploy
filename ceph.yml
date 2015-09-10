@@ -2,12 +2,6 @@
 # This playbook deploys a Ceph cluster.
 # RUN: ansible-playbook -i hosts ceph.yml
 
-- name: open up ports
-  hosts: nodes
-  sudo: true
-  roles:
-    - { role: firewalld, tags: ["misc"] }
-
 - name: install ceph (preflight check)
   hosts: ceph_base
   remote_user: vagrant
