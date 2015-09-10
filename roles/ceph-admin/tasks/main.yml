@@ -4,6 +4,7 @@
 - name: Create ssh key if not exist
   sudo: True
   user: name={{ceph_user}} generate_ssh_key=yes ssh_key_bits=2048 ssh_key_file=.ssh/id_rsa
+  when: ceph_install_mode == "base_setup"
 
 - name: Get back the key (private and public) to host
   fetch: src=/home/{{ceph_user}}/.ssh/{{ item }} dest=keys/{{ceph_user}}-{{ ansible_hostname }}-{{ item }} flat=yes
@@ -11,12 +12,46 @@
   with_items:
     - id_rsa
     - id_rsa.pub
+  when: ceph_install_mode == "base_setup"
 
 - name: Setup ssh configuration of the admin node to access ceph nodes
   template: src=./ssh_config.j2 dest=/home/{{ceph_user}}/.ssh/config
   remote_user: "{{ceph_user}}"
   sudo: True
+  when: ceph_install_mode == "base_setup"
 
 - name: Give the right permissions to the ssh config
-  file: name=/home/{{ceph_user}}/.ssh/config mode=0440 state=file
+  file: name=/home/{{ceph_user}}/.ssh/config mode=0440 state=file owner={{ceph_user}}
   sudo: True
+  when: ceph_install_mode == "base_setup"
+
+- name: Create the ceph cluster configuration folder
+  file: name=/home/{{ceph_user}}/{{ceph_cluster}} state=directory
+  remote_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "base_setup"
+
+- name: Establish first ssh connection as the ceph user
+  shell: ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {{ceph_user}}@{{item}} "echo pong" >> first_conn.txt
+  remote_user: "{{ceph_user}}"
+  sudo: True
+  sudo_user: "{{ceph_user}}"
+  when: ceph_install_mode == "connectivity_test"
+  with_items:
+    - node1
+    - node2
+    - node3
+
+#- name: Purge nodes to test that the connectivity is ok
+#  shell: ceph-deploy purgedata {{ceph_nodes}}
+#  remote_user: "{{ceph_user}}"
+#  sudo: True
+#  when: ceph_install_mode == "connectivity_test"
+
+- name: Create the cluster, on node1
+  shell: ceph-deploy new {{ceph_nodes}}
+  sudo: True
+  sudo_user: "{{ceph_user}}"
+  remote_user: "{{ceph_user}}"
+  when: ceph_install_mode == "connectivity_test"
+

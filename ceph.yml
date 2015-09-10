@@ -14,9 +14,16 @@
   remote_user: vagrant
   sudo: false
   roles:
-    - { role: ceph-admin, tags: ["ceph-admin"] }
+    - { role: ceph-admin, ceph_install_mode: "base_setup", tags: ["ceph-admin"] }
 
 - name: copy public key to nodes
   hosts: ceph_node
   roles:
     - { role: ceph-node }
+
+- name: validate ceph admin connectivity
+  hosts: ceph_admin
+  remote_user: ceph
+  sudo: true
+  roles:
+    - { role: ceph-admin, ceph_install_mode: "connectivity_test", tags: ["ceph-admin-test"] }

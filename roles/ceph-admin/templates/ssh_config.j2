@@ -1,5 +1,6 @@
 {% for host in groups['ceph_node'] %}
 Host {{ host }}
    Hostname {{ host }}
+   StrictHostKeyChecking no
    User {{ceph_user}}
 {% endfor %}
