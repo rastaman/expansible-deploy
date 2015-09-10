@@ -74,6 +74,16 @@
   sudo: True
   when: ceph_install_mode == "create_cluster"
 
+- name: Remove existing Object Store Devices on nodes
+  shell: ssh -o StrictHostKeyChecking=no {{ceph_user}}@{{item}} "sudo rm -rf /var/local/osd-{{item}}" >>ceph_install.log
+  sudo: True
+  sudo_user: "{{ceph_user}}"
+  when: ceph_install_mode == "create_cluster"
+  with_items:
+    - node1
+    - node2
+    - node3
+
 - name: Create the ceph cluster configuration folder
   file: name=/home/{{ceph_user}}/{{ceph_cluster}} state=directory
   remote_user: "{{ceph_user}}"
@@ -97,6 +107,34 @@
 
 - name: Configure network
   ini_file: dest=/home/{{ceph_user}}/{{ceph_cluster}}/ceph.conf section=global option="public network" value={{ceph_public_ip}}/{{ceph_netmask}} mode=0600 backup=yes
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "create_cluster"
+
+- name: Disable cephx (cluster)
+  ini_file: dest=/home/{{ceph_user}}/{{ceph_cluster}}/ceph.conf section=global option="auth cluster required" value="none" mode=0600 backup=no
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "create_cluster"
+
+- name: Disable cephx (service)
+  ini_file: dest=/home/{{ceph_user}}/{{ceph_cluster}}/ceph.conf section=global option="auth service required" value="none" mode=0600 backup=no
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "create_cluster"
+
+- name: Disable cephx (client)
+  ini_file: dest=/home/{{ceph_user}}/{{ceph_cluster}}/ceph.conf section=global option="auth client required" value="none" mode=0600 backup=no
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "create_cluster"
+
+- name: Disable cephx (auth)
+  ini_file: dest=/home/{{ceph_user}}/{{ceph_cluster}}/ceph.conf section=global option="auth supported" value="none" mode=0600 backup=no
   remote_user: "{{ceph_user}}"
   sudo_user: "{{ceph_user}}"
   sudo: True
@@ -156,8 +194,40 @@
 
 - name: Check that every file exist
   fail: msg="{{item.item}} didn't exist!"
-  when: item.stat.exists == False and ceph_install_mode == "init_cluster"
+  when: (ceph_install_mode == "init_cluster") and (not item.stat.exists)
   with_items: statconfig.results
   remote_user: "{{ceph_user}}"
   sudo_user: "{{ceph_user}}"
   sudo: True
+
+#ceph-deploy osd prepare node2:/var/local/osd0 node3:/var/local/osd1
+#ceph-deploy osd activate node2:/var/local/osd0 node3:/var/local/osd1
+
+- name: Prepare the OSD volumes
+  shell: ceph-deploy osd prepare {{ceph_volumes_path}} chdir=/home/{{ceph_user}}/{{ceph_cluster}}
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "create_osd"
+
+- name: Activate the OSD volumes
+  shell: ceph-deploy osd activate {{ceph_volumes_path}} chdir=/home/{{ceph_user}}/{{ceph_cluster}}
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "create_osd"
+
+- name: Deploy keys and conf
+  shell: ceph-deploy admin {{ceph_admin_node}} {{ceph_nodes}} chdir=/home/{{ceph_user}}/{{ceph_cluster}}
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "create_osd"
+
+- name: Check cluster health
+  shell: ceph health chdir=/home/{{ceph_user}}/{{ceph_cluster}}
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "create_osd"
+  

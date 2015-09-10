@@ -42,3 +42,4 @@ ceph_public_ip: 192.168.51.6
 ceph_netmask: 24
 ceph_cluster: expansible-cluster
 ceph_nodes: "{% for server in groups.ceph_node %}{{ server }}{% if not loop.last %} {% else %}{% endif %}{% endfor %}"
+ceph_volumes_path: "{% for server in groups.ceph_node %}{{ server }}:/var/local/osd-{{ server }}{% if not loop.last %} {% else %}{% endif %}{% endfor %}"

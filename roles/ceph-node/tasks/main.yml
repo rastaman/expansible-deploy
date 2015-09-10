@@ -5,12 +5,19 @@
 - name: allow sudo without password for the ceph user
   sudo: True
   copy: dest=/etc/sudoers.d/{{ceph_user}} content="{{ceph_user}} ALL = (root) NOPASSWD:ALL"
+  when: ceph_install_mode == "base_setup"
 
 - name: put the right permissions on the user sudoers file
   file: name=/etc/sudoers.d/{{ceph_user}} state=file mode=0440
+  when: ceph_install_mode == "base_setup"
   sudo: True
 
 - name: Add public key to ceph nodes and users
   authorized_key: user={{ ceph_user }} key="{{ lookup('file', 'keys/'+ ceph_user + '-' + ceph_admin_node + '-id_rsa.pub') }}"
+  when: ceph_install_mode == "base_setup"
   sudo: True
+
+- name: create Object Store Device, here a folder
+  file: name=/var/local/osd-{{inventory_hostname}} state=directory recurse=yes
+  when: ceph_install_mode == "create_osd"
 
