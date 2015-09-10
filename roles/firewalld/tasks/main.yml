@@ -1,0 +1,23 @@
+---
+# Open ports for the cluster. Should be put inside each role
+- name: Open zookeeper client
+  firewalld: port=2181/tcp permanent=true state=enabled
+
+- name: Open zookeeper server
+  firewalld: port=2888/tcp permanent=true state=enabled
+
+- name: Open marathon
+  firewalld: port=8080/tcp permanent=true state=enabled
+
+- name: Open mesos
+  firewalld: port=5050/tcp permanent=true state=enabled
+
+- name: Open mesos slave
+  firewalld: port=5051/tcp permanent=true state=enabled
+
+- name: Open ntp
+  firewalld: port=123/tcp permanent=true state=enabled
+
+- name: Restart firewalld
+  sudo: yes
+  service: name=firewalld state=restarted enabled=yes
