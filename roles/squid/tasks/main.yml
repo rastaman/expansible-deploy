@@ -16,6 +16,18 @@
   copy: src=./squid.conf dest=/etc/squid/squid.conf group=root owner=root
   sudo: yes
 
+- name: Ensure firewalld is started
+  sudo: yes
+  service: name=firewalld state=started enabled=yes
+
+- name: Set firewalld
+  sudo: yes
+  shell: firewall-cmd --permanent --add-port=3128/tcp --zone=public
+
+- name: Restart firewalld
+  sudo: yes
+  service: name=firewalld state=restarted enabled=yes
+
 - name: start squid
   service: name=squid state=started enabled=yes
   sudo: yes
