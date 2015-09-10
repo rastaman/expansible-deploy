@@ -32,7 +32,7 @@
   when: ceph_install_mode == "base_setup"
 
 - name: Establish first ssh connection as the ceph user
-  shell: ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null {{ceph_user}}@{{item}} "echo pong" >> first_conn.txt
+  shell: ssh -o StrictHostKeyChecking=no {{ceph_user}}@{{item}} "echo pong" >> first_conn.txt
   remote_user: "{{ceph_user}}"
   sudo: True
   sudo_user: "{{ceph_user}}"
