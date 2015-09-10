@@ -21,9 +21,9 @@
   roles:
     - { role: ceph-node }
 
-- name: validate ceph admin connectivity
+- name: create cluster
   hosts: ceph_admin
   remote_user: ceph
   sudo: true
   roles:
-    - { role: ceph-admin, ceph_install_mode: "connectivity_test", tags: ["ceph-admin-test"] }
+    - { role: ceph-admin, ceph_install_mode: "create_cluster", tags: ["ceph-create-cluster"] }

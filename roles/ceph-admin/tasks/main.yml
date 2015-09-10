@@ -25,33 +25,68 @@
   sudo: True
   when: ceph_install_mode == "base_setup"
 
-- name: Create the ceph cluster configuration folder
-  file: name=/home/{{ceph_user}}/{{ceph_cluster}} state=directory
-  remote_user: "{{ceph_user}}"
+- name: Add public key to ceph nodes and users
+  authorized_key: user={{ ceph_user }} key="{{ lookup('file', 'keys/'+ ceph_user + '-' + ceph_admin_node + '-id_rsa.pub') }}"
   sudo: True
-  when: ceph_install_mode == "base_setup"
+  when: ceph_install_mode == "create_cluster"
 
 - name: Establish first ssh connection as the ceph user
   shell: ssh -o StrictHostKeyChecking=no {{ceph_user}}@{{item}} "echo pong" >> first_conn.txt
   remote_user: "{{ceph_user}}"
   sudo: True
   sudo_user: "{{ceph_user}}"
-  when: ceph_install_mode == "connectivity_test"
+  when: ceph_install_mode == "create_cluster"
   with_items:
     - node1
     - node2
     - node3
+    - dk1
 
-#- name: Purge nodes to test that the connectivity is ok
-#  shell: ceph-deploy purgedata {{ceph_nodes}}
-#  remote_user: "{{ceph_user}}"
-#  sudo: True
-#  when: ceph_install_mode == "connectivity_test"
-
-- name: Create the cluster, on node1
-  shell: ceph-deploy new {{ceph_nodes}}
-  sudo: True
-  sudo_user: "{{ceph_user}}"
+- name: Purge nodes to test that the connectivity is ok
+  shell: ceph-deploy purgedata {{ceph_nodes}}
   remote_user: "{{ceph_user}}"
-  when: ceph_install_mode == "connectivity_test"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "create_cluster"
 
+- name: Remove existing keys
+  shell: ceph-deploy forgetkeys
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "create_cluster"
+
+- name: Create the ceph cluster configuration folder
+  file: name=/home/{{ceph_user}}/{{ceph_cluster}} state=directory
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "create_cluster"
+
+- name: Create the cluster
+  shell: ceph-deploy new {{ceph_nodes}} chdir=/home/{{ceph_user}}/{{ceph_cluster}}
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "create_cluster"
+
+- name: Configure replication factor
+  ini_file: dest=/home/{{ceph_user}}/{{ceph_cluster}}/ceph.conf section=global option="osd pool default size" value=2 mode=0600 backup=yes
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "create_cluster"
+
+- name: Configure network
+  ini_file: dest=/home/{{ceph_user}}/{{ceph_cluster}}/ceph.conf section=global option="public network" value={{ceph_public_ip}} mode=0600 backup=yes
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "create_cluster"
+
+- name: Install the cluster
+  shell: ceph-deploy install {{ceph_nodes}} {{ceph_admin_node}} chdir=/home/{{ceph_user}}/{{ceph_cluster}}
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "create_cluster"

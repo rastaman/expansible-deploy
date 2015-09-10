@@ -1,4 +1,4 @@
-{% for host in groups['ceph_node'] %}
+{% for host in groups['ceph_base'] %}
 Host {{ host }}
    Hostname {{ host }}
    StrictHostKeyChecking no
