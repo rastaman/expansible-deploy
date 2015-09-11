@@ -43,3 +43,5 @@ ceph_netmask: 24
 ceph_cluster: expansible-cluster
 ceph_nodes: "{% for server in groups.ceph_node %}{{ server }}{% if not loop.last %} {% else %}{% endif %}{% endfor %}"
 ceph_volumes_path: "{% for server in groups.ceph_node %}{{ server }}:/var/local/osd-{{ server }}{% if not loop.last %} {% else %}{% endif %}{% endfor %}"
+ceph_storage_pool: expansible
+ceph_pg_num: 100
