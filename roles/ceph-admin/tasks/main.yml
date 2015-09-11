@@ -230,4 +230,18 @@
   sudo_user: "{{ceph_user}}"
   sudo: True
   when: ceph_install_mode == "create_osd"
-  
+
+- name: Create metadata server
+  shell: ceph-deploy mds create node1 chdir=/home/{{ceph_user}}/{{ceph_cluster}}
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "finish_setup"
+
+- name: Add monitors
+  shell: ceph-deploy mon add node2 node3 chdir=/home/{{ceph_user}}/{{ceph_cluster}}
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: ceph_install_mode == "finish_setup"
+

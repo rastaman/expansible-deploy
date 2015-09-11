@@ -46,3 +46,15 @@
   sudo: true
   roles:
     - { role: ceph-admin, ceph_install_mode: "create_osd", tags: ["ceph-create-osds"] }
+
+- name: Create metadata server and additional monitors
+  hosts: ceph_admin
+  sudo: true
+  roles:
+    - { role: ceph-admin, ceph_install_mode: "finish_setup", tags: ["ceph-finish-setup"] }
+
+- name: Prepare RBD device
+  hosts: ceph_admin
+  sudo: true
+  roles:
+    - { role: ceph-rbd, tags: ["ceph-rbd"] }
