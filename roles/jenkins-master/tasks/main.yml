@@ -1,21 +1,77 @@
 ---
 # tasks file for roles/jenkins-master
 
-# Check that a page returns a status 200 and fail if the word AWESOME is not in the page contents.
-- name: deploy jenkins master on marathon
-  uri:
-    url: http://your.jira.example.com/rest/api/2/issue/
-    method: PUT
-    return_content: yes
-#    user: your_username
-#    password: your_pass
-#    force_basic_auth: yes
-    body: "{{ lookup('file','jenkins-master.json') }}"
-    status_code: 201
-    body_format: json
-  register: webpage
+# Delete the ceph rados block device for jenkins master
+- name: Delete RBD for Jenkins master
+  command: rbd rm {{ceph_storage_pool}}/{{jenkins_data_image}} chdir=/home/{{ceph_user}}/{{ceph_cluster}}
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  ignore_errors: true
+  when: jenkins_install_mode == "datas"
 
-- name: Fail if marathon response is not expected
-  action: fail
-  when: "'success' not in webpage.content"
+# Create a rbd for Jenkins
+- name: Create RBD for Jenkins master
+  shell: rbd create --size {{jenkins_data_size}} {{ceph_storage_pool}}/{{jenkins_data_image}} chdir=/home/{{ceph_user}}/{{ceph_cluster}}
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  when: jenkins_install_mode == "datas"
+
+# Add docker repo
+- name: Add docker repo
+  copy: src=./docker.repo dest=/etc/yum.repos.d/docker.repo
+  sudo: true
+
+# Remove old docker packages
+- name: Remove old dockers
+  yum: pkg={{item}} state=absent
+  with_items:
+    - docker-io
+    - docker
+  sudo: true
+
+# Install new docker package
+- name: install docker
+  yum: pkg=docker-engine state=latest
+  sudo: true
+
+# Start docker daemon
+- name: start docker
+  sudo: yes
+  service: name=docker state=restarted enabled=yes
+
+# Marathon/REST calls: use template like in : https://sdwr98.wordpress.com/2015/06/01/using-ansible-for-marathonchronos-deployments/
+# Mount the RBD device : http://blog.mit.bme.hu/meszaros/en/node/190
+# Use docker-rbd plugin to mount the volume inside the jenkins master container
+
+# Change the docker file from https://github.com/jenkinsci/docker/blob/master/Dockerfile
+# First, try to mount the block device on every nodes host and use it the docker
+# Check that a page returns a status 200 and fail if the word AWESOME is not in the page contents.
+# - name: Create json body
+#  template: src=templates/{{app_name}}.json.j2 dest=/var/tmp/marathon_app.json
+
+#    - name: Kick off marathon app
+#      uri: url=http://{{mesos_master}}:8080/v2/apps/{{app_name}}
+#           method=PUT
+#           body='{{ lookup("file", "/var/tmp/marathon_app.json") }}'
+#           HEADER_Content-Type="application/json"
+#           status_code=200,201,204
+#           
+#- name: deploy jenkins master on marathon
+#  uri:
+#    url: http://your.jira.example.com/rest/api/2/issue/
+#    method: PUT
+#    return_content: yes
+##    user: your_username
+##    password: your_pass
+##    force_basic_auth: yes
+#    body: "{{ lookup('file','jenkins-master.json') }}"
+#    status_code: 201
+#    body_format: json
+#  register: webpage
+#
+#- name: Fail if marathon response is not expected
+#  action: fail
+#  when: "'success' not in webpage.content"
 

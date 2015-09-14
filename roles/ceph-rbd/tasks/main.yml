@@ -31,4 +31,15 @@
   remote_user: "{{ceph_user}}"
   sudo_user: "{{ceph_user}}"
   sudo: True
-  
+
+- name: Install ceph-client on admin
+  shell: ceph-deploy install ceph-client chdir=/home/{{ceph_user}}/{{ceph_cluster}}
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+
+- name: Deploy ceph-client on nodes
+  shell: ceph-deploy admin ceph-client chdir=/home/{{ceph_user}}/{{ceph_cluster}}
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True

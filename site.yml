@@ -104,3 +104,61 @@
   sudo: true
   roles:
     - { role: firewalld, install_mode: "ceph", tags: ["misc"] }
+
+
+- name: install ceph (preflight check)
+  hosts: ceph_base
+  remote_user: vagrant
+  sudo: true
+  roles:
+    - { role: ceph-preflight, tags: ["ceph"] }
+
+- name: setup ceph admin
+  hosts: ceph_admin
+  remote_user: vagrant
+  sudo: false
+  roles:
+    - { role: ceph-admin, ceph_install_mode: "base_setup", tags: ["ceph-admin"] }
+
+- name: copy public key to nodes and add ceph to sudoers
+  hosts: ceph_base
+  roles:
+    - { role: ceph-node, ceph_install_mode: "base_setup" }
+
+- name: create cluster
+  hosts: ceph_admin
+  remote_user: ceph
+  sudo: true
+  roles:
+    - { role: ceph-admin, ceph_install_mode: "create_cluster", tags: ["ceph-create-cluster"] }
+
+- name: init Ceph OSD for the cluster
+  hosts: ceph_admin
+  remote_user: ceph
+  sudo: true
+  roles:
+    - { role: ceph-admin, ceph_install_mode: "init_cluster", tags: ["ceph-init-cluster"] }
+
+- name: create OSD on nodes
+  hosts: ceph_node
+  sudo: true
+  roles:
+    - { role: ceph-node, ceph_install_mode: "create_osd", tags: ["ceph-create-osds"] }
+
+- name: Prepare and activate OSD volumes from admin
+  hosts: ceph_admin
+  sudo: true
+  roles:
+    - { role: ceph-admin, ceph_install_mode: "create_osd", tags: ["ceph-create-osds"] }
+
+- name: Create metadata server and additional monitors
+  hosts: ceph_admin
+  sudo: true
+  roles:
+    - { role: ceph-admin, ceph_install_mode: "finish_setup", tags: ["ceph-finish-setup"] }
+
+- name: Prepare RBD device
+  hosts: ceph_admin
+  sudo: true
+  roles:
+    - { role: ceph-rbd, tags: ["ceph-rbd"] }
