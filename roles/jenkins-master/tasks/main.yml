@@ -11,12 +11,17 @@
   when: jenkins_install_mode == "datas"
 
 # Create a rbd for Jenkins
-- name: Create RBD for Jenkins master
-  shell: rbd create --size {{jenkins_data_size}} {{ceph_storage_pool}}/{{jenkins_data_image}} chdir=/home/{{ceph_user}}/{{ceph_cluster}}
-  remote_user: "{{ceph_user}}"
-  sudo_user: "{{ceph_user}}"
-  sudo: True
-  when: jenkins_install_mode == "datas"
+#- name: Create RBD for Jenkins master
+#  shell: rbd create --size {{jenkins_data_size}} {{ceph_storage_pool}}/{{jenkins_data_image}} chdir=/home/{{ceph_user}}/{{ceph_cluster}}
+#  remote_user: "{{ceph_user}}"
+#  sudo_user: "{{ceph_user}}"
+#  sudo: True
+#  when: jenkins_install_mode == "datas"
+
+# Stop docker service
+- name: stop docker
+  sudo: yes
+  service: name=docker state=stopped enabled=yes
 
 # Add docker repo
 - name: Add docker repo
@@ -36,17 +41,37 @@
   yum: pkg=docker-engine state=latest
   sudo: true
 
-# Start docker daemon
-- name: start docker
+# Stop docker service
+- name: stop rbd-docker-plugin
   sudo: yes
+  service: name=rbd-docker-plugin state=stopped enabled=yes
+
+# Upload rpm of docker rbd plugin
+- name: upload docker rbd plugin RPM
+  copy: src=rbd-docker-plugin-0.1.9-1.el7.centos.x86_64.rpm dest=/tmp/rbd-docker-plugin-0.1.9-1.el7.centos.x86_64.rpm
+
+# Install docker rbd plugin
+- name: install docker rbd plugin
+  yum: name=/tmp/rbd-docker-plugin-0.1.9-1.el7.centos.x86_64.rpm state=present
+
+# Configure the docker rbd plugin
+- name: configure docker rbd plugin
+  template: src=rbd-docker-plugin.conf.j2 dest=/etc/docker/rbd-docker-plugin.conf
+
+# Start docker rbd plugin service
+- name: start docker rbd plugin
+  service: name=rbd-docker-plugin state=started enabled=yes
+
+# Start docker service
+- name: start docker
   service: name=docker state=restarted enabled=yes
 
-# Marathon/REST calls: use template like in : https://sdwr98.wordpress.com/2015/06/01/using-ansible-for-marathonchronos-deployments/
-# Mount the RBD device : http://blog.mit.bme.hu/meszaros/en/node/190
-# Use docker-rbd plugin to mount the volume inside the jenkins master container
+# Test : deploy Jenkins-Master on docker alone with RBD
 
-# Change the docker file from https://github.com/jenkinsci/docker/blob/master/Dockerfile
-# First, try to mount the block device on every nodes host and use it the docker
+# Marathon/REST calls: use template like in : https://sdwr98.wordpress.com/2015/06/01/using-ansible-for-marathonchronos-deployments/
+# or use the module : https://github.com/wndhydrnt/ansible-marathon
+
+# Use docker-rbd plugin to mount the volume inside the jenkins master container, wait for an easy way to install
 # Check that a page returns a status 200 and fail if the word AWESOME is not in the page contents.
 # - name: Create json body
 #  template: src=templates/{{app_name}}.json.j2 dest=/var/tmp/marathon_app.json
