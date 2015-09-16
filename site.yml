@@ -43,7 +43,7 @@
   sudo: True
 
   roles:
-    - { role: docker-registry, tags: ["docker","bootstrap"] }
+    - { role: docker-registry, tags: ["docker","bootstrap","registry"] }
 
 - name: deploy and configure the mesos masters
   hosts: mesos_masters
