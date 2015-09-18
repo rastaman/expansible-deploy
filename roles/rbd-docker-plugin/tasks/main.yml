@@ -1,0 +1,27 @@
+---
+# tasks file for roles/rbd-docker-plugin
+
+# Stop docker rbd plugin service
+- name: stop rbd-docker-plugin
+  sudo: yes
+  service: name=rbd-docker-plugin state=stopped enabled=yes
+
+# Upload rpm of docker rbd plugin
+- name: upload docker rbd plugin RPM
+  copy: src=rbd-docker-plugin-0.1.9-1.el7.centos.x86_64.rpm dest=/tmp/rbd-docker-plugin-0.1.9-1.el7.centos.x86_64.rpm
+
+# Install docker rbd plugin
+- name: install docker rbd plugin
+  yum: name=/tmp/rbd-docker-plugin-0.1.9-1.el7.centos.x86_64.rpm state=present
+
+# Configure the docker rbd plugin
+- name: configure docker rbd plugin
+  template: src=rbd-docker-plugin.conf.j2 dest=/etc/docker/rbd-docker-plugin.conf
+
+# Start docker rbd plugin service
+- name: start docker rbd plugin
+  service: name=rbd-docker-plugin state=started enabled=yes
+
+# Restart docker service
+- name: start docker
+  service: name=docker state=restarted enabled=yes

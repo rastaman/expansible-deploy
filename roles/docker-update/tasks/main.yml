@@ -1,0 +1,24 @@
+---
+# tasks file for roles/docker-update
+# Stop docker service
+- name: stop docker
+  sudo: yes
+  service: name=docker state=stopped enabled=yes
+
+# Add docker repo
+- name: Add docker repo
+  copy: src=./docker.repo dest=/etc/yum.repos.d/docker.repo
+  sudo: true
+
+# Remove old docker packages
+- name: Remove old dockers
+  yum: pkg={{item}} state=absent
+  with_items:
+    - docker-io
+    - docker
+  sudo: true
+
+# Install new docker package
+- name: install docker
+  yum: pkg=docker-engine state=latest
+  sudo: true

@@ -1,0 +1,23 @@
+{
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "network": "HOST",
+      "image": "sheepkiller/jenkins-mesos",
+      "forcePullImage": true,
+      "parameters": [
+          { "key": "volume-driver", "value": "rbd" },
+          { "key": "volume", "value": "jenkins:/home:rw" }
+      ]
+    },
+    "volumes": [ ]
+  },
+  "env": {
+    "JAVA_OPTS": "-Djava.net.preferIPv4Stack=true"
+  },  
+  "id": "jenkins",
+  "instances": 1,
+  "cpus": 2,
+  "mem": 2048,
+  "uris": []
+}
