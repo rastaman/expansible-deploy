@@ -31,3 +31,6 @@
 - name: start squid
   service: name=squid state=started enabled=yes
   sudo: yes
+
+#sudo systemctl start squid
+#telnet dk1 3128

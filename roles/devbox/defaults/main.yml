@@ -1,2 +1,3 @@
 ---
 # defaults file for roles/devbox
+#go_version: 1.5.1

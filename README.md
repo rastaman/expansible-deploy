@@ -35,7 +35,7 @@ vagrant up
 vagrant halt
 ```
 
-At the first restart ( halt then up ) the vbox-addtions will be rebuilt for the
+At the first restart ( halt then up ) the vbox-additions will be rebuilt for the
  new kernel installed by yum update.
  
 ## Notes

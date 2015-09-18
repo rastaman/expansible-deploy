@@ -12,3 +12,8 @@
   sudo: yes
   tags:
     - devbox
+
+#- name: install golang
+#  copy: src=https://storage.googleapis.com/golang/go{{go_version}}.linux-amd64.tar.gz dest=go{{go_version}}.linux-amd64.tar.gz
+#  tags:
+#    - gobuild

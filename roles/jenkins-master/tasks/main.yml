@@ -2,13 +2,13 @@
 # tasks file for roles/jenkins-master
 
 # Delete the ceph rados block device for jenkins master
-- name: Delete RBD for Jenkins master
-  command: rbd rm {{ceph_storage_pool}}/{{jenkins_data_image}} chdir=/home/{{ceph_user}}/{{ceph_cluster}}
-  remote_user: "{{ceph_user}}"
-  sudo_user: "{{ceph_user}}"
-  sudo: True
-  ignore_errors: true
-  when: jenkins_install_mode == "datas"
+#- name: Delete RBD for Jenkins master
+#  command: rbd rm {{ceph_storage_pool}}/{{jenkins_data_image}} chdir=/home/{{ceph_user}}/{{ceph_cluster}}
+#  remote_user: "{{ceph_user}}"
+#  sudo_user: "{{ceph_user}}"
+#  sudo: True
+#  ignore_errors: true
+#  when: jenkins_install_mode == "datas"
 
 # Create a rbd for Jenkins
 #- name: Create RBD for Jenkins master
@@ -18,85 +18,6 @@
 #  sudo: True
 #  when: jenkins_install_mode == "datas"
 
-# Stop docker service
-- name: stop docker
-  sudo: yes
-  service: name=docker state=stopped enabled=yes
-
-# Add docker repo
-- name: Add docker repo
-  copy: src=./docker.repo dest=/etc/yum.repos.d/docker.repo
-  sudo: true
-
-# Remove old docker packages
-- name: Remove old dockers
-  yum: pkg={{item}} state=absent
-  with_items:
-    - docker-io
-    - docker
-  sudo: true
-
-# Install new docker package
-- name: install docker
-  yum: pkg=docker-engine state=latest
-  sudo: true
-
-# Stop docker service
-- name: stop rbd-docker-plugin
-  sudo: yes
-  service: name=rbd-docker-plugin state=stopped enabled=yes
-
-# Upload rpm of docker rbd plugin
-- name: upload docker rbd plugin RPM
-  copy: src=rbd-docker-plugin-0.1.9-1.el7.centos.x86_64.rpm dest=/tmp/rbd-docker-plugin-0.1.9-1.el7.centos.x86_64.rpm
-
-# Install docker rbd plugin
-- name: install docker rbd plugin
-  yum: name=/tmp/rbd-docker-plugin-0.1.9-1.el7.centos.x86_64.rpm state=present
-
-# Configure the docker rbd plugin
-- name: configure docker rbd plugin
-  template: src=rbd-docker-plugin.conf.j2 dest=/etc/docker/rbd-docker-plugin.conf
-
-# Start docker rbd plugin service
-- name: start docker rbd plugin
-  service: name=rbd-docker-plugin state=started enabled=yes
-
-# Start docker service
-- name: start docker
-  service: name=docker state=restarted enabled=yes
-
-# Test : deploy Jenkins-Master on docker alone with RBD
-
-# Marathon/REST calls: use template like in : https://sdwr98.wordpress.com/2015/06/01/using-ansible-for-marathonchronos-deployments/
-# or use the module : https://github.com/wndhydrnt/ansible-marathon
-
-# Use docker-rbd plugin to mount the volume inside the jenkins master container, wait for an easy way to install
-# Check that a page returns a status 200 and fail if the word AWESOME is not in the page contents.
-# - name: Create json body
-#  template: src=templates/{{app_name}}.json.j2 dest=/var/tmp/marathon_app.json
-
-#    - name: Kick off marathon app
-#      uri: url=http://{{mesos_master}}:8080/v2/apps/{{app_name}}
-#           method=PUT
-#           body='{{ lookup("file", "/var/tmp/marathon_app.json") }}'
-#           HEADER_Content-Type="application/json"
-#           status_code=200,201,204
-#           
-#- name: deploy jenkins master on marathon
-#  uri:
-#    url: http://your.jira.example.com/rest/api/2/issue/
-#    method: PUT
-#    return_content: yes
-##    user: your_username
-##    password: your_pass
-##    force_basic_auth: yes
-#    body: "{{ lookup('file','jenkins-master.json') }}"
-#    status_code: 201
-#    body_format: json
-#  register: webpage
-#
-#- name: Fail if marathon response is not expected
-#  action: fail
-#  when: "'success' not in webpage.content"
-
+localhost
+  connection: local
+  gather_facts: no

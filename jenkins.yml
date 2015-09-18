@@ -2,9 +2,7 @@
 # This playbook deploys a Ceph cluster.
 # RUN: ansible-playbook -i hosts ceph.yml
 
-- name: install ceph (preflight check)
-  hosts: ceph_admin
-  remote_user: vagrant
-  sudo: true
+- name: install jenkins
+  hosts: localhost
   roles:
-    - { role: jenkins-master, jenkins_install_mode: "datas", tags: ["jenkins"] }
+    - { role: jenkins-master, tags: ["jenkins"] }
