@@ -1,0 +1,8 @@
+---
+# This playbook deploys a docker registry v2.
+# RUN: ansible-playbook -i hosts registry.yml
+
+- name: install docker registry v2
+  hosts: docker-registry
+  roles:
+    - { role: docker-registry }

@@ -18,12 +18,6 @@
   sudo_user: "{{ceph_user}}"
   sudo: True
 
-- name: Set number of placement groups
-  ini_file: dest=/home/{{ceph_user}}/{{ceph_cluster}}/ceph.conf section=global option="osd pool default pgp num" value="100" mode=0600 backup=no
-  remote_user: "{{ceph_user}}"
-  sudo_user: "{{ceph_user}}"
-  sudo: True
-
 # ceph osd dump | grep 'replicated size'
 
 - name: Create storage pools
