@@ -3,6 +3,6 @@
 # RUN: ansible-playbook -i hosts ceph.yml
 
 - name: install jenkins
-  hosts: localhost
+  hosts: jenkins_master_outside_mesos
   roles:
     - { role: jenkins-master, tags: ["jenkins"] }

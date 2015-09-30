@@ -62,3 +62,6 @@ node3
 
 [docker-registry]
 dk1
+
+[jenkins_master_outside_mesos]
+dk1

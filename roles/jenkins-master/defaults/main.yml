@@ -1,4 +1,4 @@
 ---
 # defaults file for roles/jenkins-master
-jenkins_data_image: jenkins
+jenkins_data_image: jenkins-master
 jenkins_data_size: 1024

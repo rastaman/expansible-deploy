@@ -2,13 +2,12 @@
 # tasks file for roles/jenkins-master
 
 # Delete the ceph rados block device for jenkins master
-#- name: Delete RBD for Jenkins master
-#  command: rbd rm {{ceph_storage_pool}}/{{jenkins_data_image}} chdir=/home/{{ceph_user}}/{{ceph_cluster}}
-#  remote_user: "{{ceph_user}}"
-#  sudo_user: "{{ceph_user}}"
-#  sudo: True
-#  ignore_errors: true
-#  when: jenkins_install_mode == "datas"
+- name: Delete RBD for Jenkins master
+  command: rbd rm {{jenkins_data_image}} chdir=/home/{{ceph_user}}/{{ceph_cluster}}
+  remote_user: "{{ceph_user}}"
+  sudo_user: "{{ceph_user}}"
+  sudo: True
+  ignore_errors: true
 
 # Create a rbd for Jenkins
 #- name: Create RBD for Jenkins master
@@ -16,8 +15,23 @@
 #  remote_user: "{{ceph_user}}"
 #  sudo_user: "{{ceph_user}}"
 #  sudo: True
-#  when: jenkins_install_mode == "datas"
 
-localhost
-  connection: local
-  gather_facts: no
+#localhost
+#  connection: local
+#  gather_facts: no
+#docker run -p 8080:8080 -p 50000:50000 --volume-driver=rbd -v /jenkins-master:/var/jenkins_home jenkins
+- name: images-container
+  sudo: yes
+  docker:
+    name: jenkins
+    image: jenkins
+    state: started
+    expose:
+      - 8080
+      - 50000
+    ports:
+      - 8081:8080
+      - 50000:50000
+#    volumes:
+#      - jenkins-master:/var/jenkins_home:rw
+#    volume_driver: rbd

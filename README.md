@@ -42,3 +42,16 @@ At the first restart ( halt then up ) the vbox-additions will be rebuilt for the
 
 The docker local storage and docker registry content are not cached, but the 
 RPMs are.
+
+### ceph.yml
+
+This playbook has somewhat benn retroffited in the mali site.yml playbook. 
+It installs a development ceph cluster with Rados block device (RBD) support.
+
+### registry.yml
+
+This playbook require the version of docker-py patched to support the volume-driver parameter.
+
+### jenkins.yml
+
+This playbook is a work in progress and will install a jenkins master configured to run and instantiate workers inside the mesos cluster.
